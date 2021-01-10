@@ -1,0 +1,16 @@
+{
+  "resource": "/user",
+  "path": "/user",
+  "httpMethod": "GET",
+  "requestContext": {},
+  "headers": {
+    "cache-control": "max-age=0",
+    "dnt": "1",
+    "Host": "aenjfn79h0.execute-api.eu-central-1.amazonaws.com",
+    "upgrade-insecure-requests": "1",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
+  },
+  "stageVariables": null,
+  "isBase64Encoded": false,
+  "queryStringParameters": { "userId": "1" }
+}

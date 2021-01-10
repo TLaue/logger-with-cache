@@ -106,3 +106,4 @@ dist
 samconfig.toml
 .aws-sam/*
 .vscode/
+env.json

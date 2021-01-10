@@ -107,3 +107,4 @@ samconfig.toml
 .aws-sam/*
 .vscode/
 env.json
+events/*

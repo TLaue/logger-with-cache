@@ -1,5 +1,3 @@
-"use strict";
-
 const middy = require("middy");
 const sampleLogging = require("@dazn/lambda-powertools-middleware-sample-logging");
 
@@ -10,7 +8,7 @@ module.exports = (lambdaHandler) => {
     log.debug(`Input event...`, { event });
 
     try {
-      const response = await lambdaHandler(event, context);
+      const response = await lambdaHandler(event, context, log);
 
       log.clear();
       log.info(
@@ -28,7 +26,7 @@ module.exports = (lambdaHandler) => {
 
   return middy(lambdaWrapper).use(
     sampleLogging({
-      sampleRate: parseFloat(process.env.SAMPLE_DEBUG_LOG_RATE || "0.20"),
+      sampleRate: parseFloat(process.env.SAMPLE_DEBUG_LOG_RATE || "0.05"),
     })
   );
 };

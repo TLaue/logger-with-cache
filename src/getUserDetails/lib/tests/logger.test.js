@@ -2,15 +2,17 @@
 
 const { expect } = require("chai");
 const sinon = require("sinon");
+const sandbox = sinon.createSandbox();
 
-const BasicLogger = require("../../../src/cloudutils/node_modules/@dazn/lambda-powertools-logger");
-const underTest = require("../../../src/cloudutils/misc/logger");
+const BasicLogger = require("@dazn/lambda-powertools-logger");
+const underTest = require("../logger");
 
 describe("logger", () => {
   const testMessage = "Test message";
 
   describe("Verify basic functionality", () => {
     before(() => resetToDebugLevel());
+    afterEach(() => sandbox.restore());
 
     it("Should trigger debug method", () => {
       performTest("debug");
@@ -33,7 +35,7 @@ describe("logger", () => {
     });
 
     const performTest = (level = "debug", params = {}, error) => {
-      const stub = sinon.stub(BasicLogger.prototype, level);
+      const stub = sandbox.stub(BasicLogger.prototype, level);
 
       if (error) {
         underTest[level](testMessage, params, error);
@@ -51,16 +53,15 @@ describe("logger", () => {
   });
 
   describe("Verify caching behaviour", () => {
-    let debugStub;
     beforeEach(() => {
       underTest.setLevel("WARN");
-      debugStub = sinon.stub(BasicLogger.prototype, "debug");
+      sandbox.stub(BasicLogger.prototype, "debug");
     });
 
     afterEach(() => {
+      sandbox.restore();
       resetToDebugLevel();
-      underTest.removeAllMessages();
-      debugStub.restore();
+      underTest.clear();
     });
 
     it("Should put into cache if current log level is higher than called level", () => {
@@ -72,14 +73,14 @@ describe("logger", () => {
       underTest.debug(testMessage);
       expect(underTest.numOfLogMessages).to.equal(1);
 
-      underTest.removeAllMessages();
+      underTest.clear();
       expect(underTest.numOfLogMessages).to.equal(0);
     });
 
     it("Should flush all messages", () => {
-      const infoStub = sinon.spy(BasicLogger.prototype, "info");
-      const enableDebugSpy = sinon.spy(BasicLogger, "enableDebug");
-      const resetLevelSpy = sinon.spy(BasicLogger, "resetLevel");
+      sandbox.spy(BasicLogger.prototype, "info");
+      sandbox.spy(BasicLogger, "enableDebug");
+      sandbox.spy(BasicLogger, "resetLevel");
 
       underTest.debug(testMessage);
       underTest.info(testMessage);
@@ -88,14 +89,10 @@ describe("logger", () => {
       underTest.flushAllMessages();
       expect(underTest.numOfLogMessages).to.equal(0);
 
-      sinon.assert.calledTwice(debugStub);
-      sinon.assert.calledTwice(infoStub);
-      sinon.assert.calledOnce(enableDebugSpy);
-      sinon.assert.calledOnce(resetLevelSpy);
-
-      enableDebugSpy.restore();
-      resetLevelSpy.restore();
-      infoStub.restore();
+      sinon.assert.calledTwice(BasicLogger.prototype.debug);
+      sinon.assert.calledTwice(BasicLogger.prototype.info);
+      sinon.assert.calledOnce(BasicLogger.enableDebug);
+      sinon.assert.calledOnce(BasicLogger.resetLevel);
     });
   });
 

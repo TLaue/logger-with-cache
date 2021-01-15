@@ -1,12 +1,10 @@
-"use strict";
-
 const log = require("@dazn/lambda-powertools-logger");
 
 const LogLevels = {
   DEBUG: 20,
   INFO: 30,
   WARN: 40,
-  ERROR: 50
+  ERROR: 50,
 };
 
 class Logger {

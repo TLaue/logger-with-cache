@@ -10,6 +10,7 @@ Globals:
       Variables:
         LOG_LEVEL: INFO
         MemorySize: 512
+
 Resources:
   GetUserDetailsFunction:
     Type: AWS::Serverless::Function
@@ -29,6 +30,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref UserTable
+          SAMPLE_DEBUG_LOG_RATE: 0.1
 
   UserTable:
     Type: AWS::Serverless::SimpleTable

@@ -8,69 +8,81 @@ const LogLevels = {
 };
 
 class Logger {
+  #logMessages = [];
+  #level = "DEBUG";
+
   constructor() {
-    this.level = log.level;
-    this.logMessages = [];
+    this.#level = log.level;
   }
 
-  addToCache(levelName, ...params) {
-    const level = LogLevels[levelName];
-    if (level < LogLevels[this.level]) {
-      this.logMessages.push({ levelName, params });
+  handleMessage(levelName = "debug", message = "", params = {}, error = {}) {
+    log[levelName](message, params, error);
+
+    const level = LogLevels[levelName.toUpperCase()];
+
+    if (level < LogLevels[this.#level]) {
+      this.addToCache(levelName, message, params, error);
+      return;
     }
   }
 
-  setLevel(newLevel) {
-    this.level = newLevel;
+  addToCache(levelName, ...params) {
+    this.#logMessages.push({ levelName, params });
   }
 
-  flush() {
+  writeAllMessages() {
     try {
       // The log level of the log has to be set do "debug" as the current log
       // level might prevent messages from being logged.
       log.enableDebug();
 
-      this.logMessages.forEach((item) => log[item.levelName.toLowerCase()](...item.params));
-      this.clear();
+      this.#logMessages.forEach((item) => {
+        log[item.levelName.toLowerCase()](...item.params);
+      });
     } finally {
       log.resetLevel();
     }
   }
 
   clear() {
-    this.logMessages.length = 0;
+    this.#logMessages.length = 0;
   }
 
-  static setLevel(newLevel) {
-    globalLogger.setLevel(newLevel);
+  setLevel(newLevel) {
+    this.#level = newLevel;
+  }
+
+  static setLevel(levelName) {
+    const level = LogLevels[levelName.toUpperCase];
+    if (level === -1) {
+      throw new Error(`Invalid log level: [${levelName}]`);
+    }
+
+    globalLogger.setLevel(levelName);
   }
 
   static get numOfLogMessages() {
-    return globalLogger.logMessages.length;
+    return globalLogger.#logMessages.length;
   }
 
   static debug(message, params) {
-    log.debug(message, params);
-    globalLogger.addToCache("DEBUG", message, params);
+    globalLogger.handleMessage("debug", message, params);
   }
 
   static info(message, params) {
-    log.info(message, params);
-    globalLogger.addToCache("INFO", message, params);
+    globalLogger.handleMessage("info", message, params);
   }
 
   static warn(message, params, error) {
-    log.warn(message, params, error);
-    globalLogger.addToCache("WARN", message, params, error);
+    globalLogger.handleMessage("warn", message, params, error);
   }
 
   static error(message, params, error) {
-    log.error(message, params, error);
-    globalLogger.addToCache("ERROR", message, params, error);
+    globalLogger.handleMessage("error", message, params, error);
   }
 
-  static flushAllMessages() {
-    globalLogger.flush();
+  static writeAllMessages() {
+    globalLogger.writeAllMessages();
   }
 
   static clear() {

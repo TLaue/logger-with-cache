@@ -9,7 +9,7 @@ const handler = async (event, context, log) => {
   const userId = event.queryStringParameters.userId;
   const { name, age } = await getUserDetailsFromDB(userId, log);
 
-  if (Math.random() > 0.5) {
+  if (Math.random() > 0.8) {
     throw new Error("An error occurred");
   }
 

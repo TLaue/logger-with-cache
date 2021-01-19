@@ -10,7 +10,6 @@ module.exports = (lambdaHandler) => {
     try {
       const response = await lambdaHandler(event, context, log);
 
-      log.clear();
       log.info(
         `Function [${context.functionName}] finished successfully with result: [${JSON.stringify(
           response
@@ -19,8 +18,10 @@ module.exports = (lambdaHandler) => {
 
       return response;
     } catch (error) {
-      log.flushAllMessages();
+      log.writeAllMessages();
       throw error;
+    } finally {
+      log.clear();
     }
   };
 

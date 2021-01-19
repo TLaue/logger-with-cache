@@ -77,20 +77,17 @@ describe("logger", () => {
       expect(underTest.numOfLogMessages).to.equal(0);
     });
 
-    it("Should flush all messages", () => {
+    it("Should write all messages", () => {
       sandbox.spy(BasicLogger.prototype, "info");
       sandbox.spy(BasicLogger, "enableDebug");
       sandbox.spy(BasicLogger, "resetLevel");
 
       underTest.debug(testMessage);
       underTest.info(testMessage);
-      expect(underTest.numOfLogMessages).to.equal(2);
+      underTest.writeAllMessages();
 
-      underTest.flushAllMessages();
-      expect(underTest.numOfLogMessages).to.equal(0);
-
-      sinon.assert.calledTwice(BasicLogger.prototype.debug);
-      sinon.assert.calledTwice(BasicLogger.prototype.info);
+      sinon.assert.calledOnce(BasicLogger.prototype.debug);
+      sinon.assert.calledOnce(BasicLogger.prototype.info);
       sinon.assert.calledOnce(BasicLogger.enableDebug);
       sinon.assert.calledOnce(BasicLogger.resetLevel);
     });

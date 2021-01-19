@@ -108,3 +108,5 @@ samconfig.toml
 .vscode/
 env.json
 events/*
+event.json
+.npmignore
